@@ -14,12 +14,7 @@
 
 package glade.main;
 
-import glade.constants.program.FlexData;
-import glade.constants.program.GrepData;
-import glade.constants.program.PythonData;
-import glade.constants.program.PythonWrappedData;
-import glade.constants.program.SedData;
-import glade.constants.program.XmlData;
+import glade.constants.program.*;
 import glade.grammar.fuzz.GrammarFuzzer.CombinedMutationSampler;
 import glade.grammar.fuzz.GrammarFuzzer.GrammarMutationSampler;
 import glade.grammar.fuzz.GrammarFuzzer.GrammarSampler;
@@ -65,11 +60,15 @@ public class Settings {
 	}
 	
 	public static enum Program {
-		XML, GREP, SED, FLEX, PYTHON, PYTHON_WRAPPED;
+		ARITH, XML, XMLPARSER, GREP, SED, FLEX, PYTHON, PYTHON_WRAPPED;
 		public ProgramSettings getSettings() {
 			switch(this) {
+			case ARITH:
+				return new ProgramSettings(ArithData.ARITH_DATA, ArithData.ARITH_EXAMPLES, ArithData.ARITH_NAME);
 			case XML:
 				return new ProgramSettings(XmlData.XML_DATA, XmlData.XML_EXAMPLES, XmlData.XML_NAME);
+			case XMLPARSER:
+				return new ProgramSettings(XmlParserData.XML_DATA, XmlParserData.XML_EXAMPLES, XmlParserData.XML_NAME);
 			case PYTHON:
 				return new ProgramSettings(PythonData.PYTHON_DATA, PythonData.PYTHON_EXAMPLES, PythonData.PYTHON_NAME);
 			case PYTHON_WRAPPED:

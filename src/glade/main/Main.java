@@ -126,10 +126,14 @@ public class Main {
 			return Program.SED;
 		} else if(programName.equals("grep")) {
 			return Program.GREP;
+		 }else if(programName.equals("arith")) {
+			return Program.ARITH;
 		} else if(programName.equals("flex")) {
 			return Program.FLEX;
 		} else if(programName.equals("xml")) {
 			return Program.XML;
+		} else if(programName.equals("xmlparser")) {
+			return Program.XMLPARSER;
 		} else if(programName.equals("python")) {
 			return Program.PYTHON;
 		} else if(programName.equals("python-wrapped")) {
