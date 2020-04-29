@@ -11,7 +11,7 @@ public class ArithData {
     public static final String ARITH_EXE = "arith/parse_arith.py";
     public static final boolean ARITH_IS_ERROR = true;
     public static final String ARITH_EXTENSION = ".arith";
-    public static final String ARITH_EMPTY = "int";
+    public static final String ARITH_EMPTY = "1";
 
     public static final String ARITH_NAME = "arith";
     public static final ProgramData ARITH_DATA = new ShellProgramData(Files.FILE_PARAMETERS, ARITH_EXE, ARITH_IS_ERROR);
