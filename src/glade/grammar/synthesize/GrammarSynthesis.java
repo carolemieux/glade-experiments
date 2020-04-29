@@ -40,6 +40,7 @@ public class GrammarSynthesis {
 		if(!oracle.query(example)) {
 			throw new RuntimeException("Invalid example: " + example);
 		}
+		Log.info("Query time: " + ((System.currentTimeMillis() - time)) + " milliseconds");
 		Log.info("PROCESSING EXAMPLE:\n" + example);
 		Node node = getNode(example, oracle);
 		Log.info("SINGLE REGEX TIME: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");

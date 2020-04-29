@@ -75,42 +75,84 @@ public class GrammarSerializer {
 		String extraPost = deserializeString(dis);
 		return new NodeData(example, new Context(new Context(), pre, post, extraPre, extraPost));
 	}
+
+
+	public static String toHexString(String s) {
+		StringBuilder out = new StringBuilder();
+		for (char ch: s.toCharArray()) {
+			if (ch >= 32 && ch < 127){
+				out.append(String.format("%c", ch));
+			} else
+			{
+				out.append(String.format("0x%02X", (byte)(ch)));
+			}
+		}
+		return out.toString();
+	}
 	
 	public static void serialize(Grammar grammar, DataOutputStream dos) throws IOException {
 		List<Node> nodes = GrammarUtils.getAllNodes(grammar.node);
 		Map<Node,Integer> nodeIds = Utils.getInverse(nodes);
 		dos.writeInt(nodes.size()); // 0
+		System.out.println("[LOG-NODE] Grammar has " + Integer.toString(nodes.size()) + " nodes.");
+		System.out.println("[GRAMMAR] " + Integer.toString(nodes.size()) + " nodes.");
+		int j = 0;
 		for(Node node : nodes) {
 			dos.writeInt(nodeIds.get(node)); // 1
 			serialize(node.getData(), dos); // 2
 			if(node instanceof ConstantNode) {
+				System.out.println("ConstantNode");
+				System.out.println("[GRAMMAR] N" + nodeIds.get(node) + " -> " + toHexString(node.toString()));
 				dos.writeInt(0); // 3/1
 			} else if(node instanceof AlternationNode) {
+				System.out.println("AltNode");
 				AlternationNode altNode = (AlternationNode)node;
+				System.out.println("[GRAMMAR] N" + nodeIds.get(node) + " -> N" + nodeIds.get(altNode.first) + " | N" + nodeIds.get(altNode.second));
 				dos.writeInt(1); // 3/1
 				dos.writeInt(nodeIds.get(altNode.first)); // 3/2
 				dos.writeInt(nodeIds.get(altNode.second)); // 3/3
 			} else if(node instanceof MultiAlternationNode) {
+
+				System.out.println("MaltNode");
 				MultiAlternationNode maltNode = (MultiAlternationNode)node;
+				System.out.print("[GRAMMAR] N" + nodeIds.get(node) + " -> ");
 				dos.writeInt(2); // 3/1
 				dos.writeInt(maltNode.getChildren().size()); // 3/2
+				boolean start = true;
 				for(Node child : maltNode.getChildren()) {
+					if (start){
+						start = false;
+					} else {
+						System.out.print(" | ");
+					}
+					System.out.print("N");
+					System.out.print(nodeIds.get(child));
 					dos.writeInt(nodeIds.get(child)); // 3/3
 				}
+				if (start){
+					System.out.print("EPSILON");
+				}
+				System.out.print("\n");
 			} else if(node instanceof RepetitionNode) {
+				System.out.println("RepNode");
 				RepetitionNode repNode = (RepetitionNode)node;
 				dos.writeInt(3); // 3/1
+
+				System.out.println("[GRAMMAR] N" +  nodeIds.get(node) + " -> N" + nodeIds.get(repNode.start) + " N" + nodeIds.get(repNode.rep) + "* N" + nodeIds.get(repNode.end) );
 				dos.writeInt(nodeIds.get(repNode.start)); // 3/2
 				dos.writeInt(nodeIds.get(repNode.rep)); // 3/3
 				dos.writeInt(nodeIds.get(repNode.end)); // 3/4
 			} else if(node instanceof MultiConstantNode) {
+				System.out.println("MConstantNode");
 				MultiConstantNode mconstNode = (MultiConstantNode)node;
 				dos.writeInt(4); // 3/1
 				dos.writeInt(mconstNode.characterOptions.size()); // 3/2
+				int k = 0;
 				for(int i=0; i<mconstNode.characterOptions.size(); i++) {
 					Set<Character> characterOption = mconstNode.characterOptions.get(i);
 					dos.writeInt(characterOption.size()); // 3/3
 					for(char c : characterOption) {
+						k++;
 						dos.writeChar(c); // 3/4
 					}
 					Set<Character> characterChecks = mconstNode.characterChecks.get(i);
@@ -119,9 +161,11 @@ public class GrammarSerializer {
 						dos.writeChar(c); // 3/6
 					}
 				}
+				System.out.println("[GRAMMAR] N" + nodeIds.get(node) + " -> " + (k == 0 ? "EPSILON" : toHexString(node.toString())));
 			} else {
 				throw new RuntimeException("Unrecognized node type: " + node.getClass().getName());
 			}
+			j++;
 		}
 		dos.writeInt(grammar.merges.keySet().size()); // 4
 		for(Node first : grammar.merges.keySet()) {

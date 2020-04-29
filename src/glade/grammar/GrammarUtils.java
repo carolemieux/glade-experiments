@@ -60,6 +60,10 @@ public class GrammarUtils {
 			this.example = example;
 			this.context = context;
 		}
+
+		public String getExample() {
+			return example;
+		}
 	}
 	
 	public static interface Node {
@@ -109,10 +113,16 @@ public class GrammarUtils {
 			StringBuilder sb = new StringBuilder();
 			for(Set<Character> characterOption : this.characterOptions) {
 				sb.append("(");
+				boolean start = true;
 				for(char character : characterOption) {
-					sb.append(character).append("+");
+					if (start){
+						sb.append(character);
+						start = false;
+					} else {
+						sb.append(" | ").append(character);
+					}
 				}
-				sb.replace(sb.length()-1, sb.length(), ")");
+				sb.append(")");
 			}
 			return sb.toString();
 		}
