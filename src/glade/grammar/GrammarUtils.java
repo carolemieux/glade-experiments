@@ -112,17 +112,26 @@ public class GrammarUtils {
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			for(Set<Character> characterOption : this.characterOptions) {
-				sb.append("(");
-				boolean start = true;
-				for(char character : characterOption) {
-					if (start){
+				if (characterOption.size() > 1 ) {
+					sb.append("(");
+					boolean start = true;
+					for(char character : characterOption) {
+						if (start){
+							sb.append(character);
+							start = false;
+						} else {
+							sb.append(" | ").append(character);
+						}
+					}
+					sb.append(")");
+				} else {
+					boolean start = true;
+					for(char character : characterOption) {
+						assert(start);
 						sb.append(character);
 						start = false;
-					} else {
-						sb.append(" | ").append(character);
 					}
 				}
-				sb.append(")");
 			}
 			return sb.toString();
 		}

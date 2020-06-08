@@ -60,7 +60,7 @@ public class Settings {
 	}
 	
 	public static enum Program {
-		ARITH, XML, XMLPARSER, GREP, SED, FLEX, PYTHON, PYTHON_WRAPPED;
+		ARITH, XML, XMLPARSER, GREP, SED, FLEX, PYTHON, PYTHON_WRAPPED, WHILEPY, WHILE;
 		public ProgramSettings getSettings() {
 			switch(this) {
 			case ARITH:
@@ -77,6 +77,10 @@ public class Settings {
 				return new ProgramSettings(GrepData.GREP_DATA, GrepData.GREP_EXAMPLES, GrepData.GREP_NAME);
 			case SED:
 				return new ProgramSettings(SedData.SED_DATA, SedData.SED_EXAMPLES, SedData.SED_NAME);
+			case WHILEPY:
+				return new ProgramSettings(WhilePyData.WHILEPY_DATA, WhilePyData.WHILEPY_EXAMPLES, WhilePyData.WHILEPY_NAME);
+			case WHILE:
+				return new ProgramSettings(WhileData.WHILE_DATA, WhileData.WHILE_EXAMPLES, WhileData.WHILE_NAME);
 			case FLEX:
 				return new ProgramSettings(FlexData.FLEX_DATA, FlexData.FLEX_EXAMPLES, FlexData.FLEX_NAME);
 			default:

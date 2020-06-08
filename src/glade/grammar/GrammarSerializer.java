@@ -258,7 +258,7 @@ public class GrammarSerializer {
 			}
 		}
 		private Node deserialize(int index) {
-			if(this.nodes.get(index) == null) {
+			if (this.nodes.get(index) == null) {
 				NodeSerialization nodeSerialization = this.nodeSerializations.get(index);
 				if(nodeSerialization instanceof ConstantNodeSerialization) {
 					this.nodes.set(index, new ConstantNode(nodeSerialization.getData()));
@@ -277,7 +277,8 @@ public class GrammarSerializer {
 					this.nodes.set(index, new RepetitionNode(repNodeSerialization.getData(), this.deserialize(repNodeSerialization.start), this.deserialize(repNodeSerialization.rep), this.deserialize(repNodeSerialization.end)));
 				} else if(nodeSerialization instanceof MultiConstantNodeSerialization) {
 					MultiConstantNodeSerialization mconstNodeSerialization = (MultiConstantNodeSerialization)nodeSerialization;
-					return new MultiConstantNode(mconstNodeSerialization.getData(), mconstNodeSerialization.characterOptions, mconstNodeSerialization.characterChecks);
+					MultiConstantNode mcn = new MultiConstantNode(mconstNodeSerialization.getData(), mconstNodeSerialization.characterOptions, mconstNodeSerialization.characterChecks);
+					this.nodes.set(index, mcn);
 				} else {
 					throw new RuntimeException("Unrecognized node type: " + nodeSerialization.getClass().getName());
 				}
@@ -354,6 +355,7 @@ public class GrammarSerializer {
 				int first = dis.readInt(); // 6
 				int second = dis.readInt(); // 7
 				merges.add(nodes.get(first), nodes.get(second));
+				System.out.printf("MERGE %d, %d: N%d == N%d\n", i, j, first, second);
 			}
 		}		
 		return new Grammar(nodes.get(0), merges);
