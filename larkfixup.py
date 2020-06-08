@@ -1,8 +1,11 @@
 import sys
+from collections import defaultdict
 import re
 
 
 grammar_line = re.compile("(\[GRAMMAR\] )(.*)")
+final_gram_line = re.compile("([mn][0-9]+): (.*)")
+grammar = defaultdict(set)
 merge_line = re.compile("\[MERGE\] (.*): (.*) == (.*)")
 equiv_sets = []
 replace_map = {}
@@ -12,7 +15,9 @@ def process_grammar_line(line, match):
     outline = outline.replace('"NEWLINE"', "NEWLINE")
     for key, replace in replace_map.items():
         outline = outline.replace(key, replace)
-    print(outline)
+    m = final_gram_line.match(outline)
+    assert(m)
+    grammar[m.group(1)].add(m.group(2))
 
 def process_merge_line(line, match):
     first = match.group(2)
@@ -50,9 +55,15 @@ def main():
     for ml, mm in merge_lines:
         process_merge_line(ml, mm)
     process_merge_sets()
-    print('NEWLINE: "\n"')
+    print('NEWLINE: "\\n"')
+    print('start: n0')
     for gl, gm in grammar_lines:
         process_grammar_line(gl, gm)
+    for rule, prods in grammar.items():
+        prods = list(prods)
+        print(f"{rule}: {prods[0]}")
+        for prod in prods[1:]:
+            print(f"    | {prod}")
 
 
 

@@ -117,7 +117,7 @@ public class GrammarUtils {
 			StringBuilder sb = new StringBuilder();
 			int numCOs = this.characterOptions.size();
 			if (numCOs == 0){
-				return "\"\"";
+				return "";
 			}
 			int i = 0;
 			boolean needsOpen = true;
@@ -236,7 +236,7 @@ public class GrammarUtils {
 		@Override
 		public String toStringLark(Map<Node, Integer> nodeIds) {
 			if (this.children.size() == 0){
-				return "\"\"";
+				return "";
 			} else {
 				StringBuilder sb = new StringBuilder();
 				for(Node child : this.children) {
