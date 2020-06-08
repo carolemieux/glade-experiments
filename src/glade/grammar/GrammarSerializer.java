@@ -80,7 +80,7 @@ public class GrammarSerializer {
 		StringBuilder out = new StringBuilder();
 		for (char ch: s.toCharArray()) {
 			if (ch == '\n'){
-				out.append("NEWLINE");
+				out.append("\\n");
 			}
 			else if (ch >= 32 && ch < 127){
 				out.append(String.format("%c", ch));
