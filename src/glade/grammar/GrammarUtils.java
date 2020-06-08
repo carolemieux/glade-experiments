@@ -16,10 +16,7 @@ package glade.grammar;
 
 import glade.util.Utils.MultivalueMap;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class GrammarUtils {
 	static boolean larkOutput = Boolean.getBoolean("glade.serialize.lark");
@@ -71,6 +68,7 @@ public class GrammarUtils {
 	public static interface Node {
 		public abstract List<Node> getChildren();
 		public abstract NodeData getData();
+		public abstract String toStringLark(Map<Node, Integer> nodeIds);
 	}
 	
 	public static class ConstantNode implements Node {
@@ -83,6 +81,9 @@ public class GrammarUtils {
 		}
 		public NodeData getData() {
 			return this.data;
+		}
+		public String toStringLark(Map<Node, Integer> nodeIds) {
+			return "\"" + this.data.example + "\"";
 		}
 		public String toString() {
 			return this.data.example;
@@ -112,7 +113,7 @@ public class GrammarUtils {
 			return this.data;
 		}
 
-		private String toStringLark() {
+		public String toStringLark(Map<Node, Integer> nodeIds) {
 			StringBuilder sb = new StringBuilder();
 			int numCOs = this.characterOptions.size();
 			int i = 0;
@@ -160,9 +161,6 @@ public class GrammarUtils {
 		}
 
 		public String toString() {
-			if (GrammarUtils.larkOutput) {
-				return toStringLark();
-			}
 			StringBuilder sb = new StringBuilder();
 			for(Set<Character> characterOption : this.characterOptions) {
 				if (characterOption.size() > 1 ) {
@@ -208,6 +206,9 @@ public class GrammarUtils {
 		public NodeData getData() {
 			return this.data;
 		}
+		public String toStringLark(Map<Node,Integer> nodeIds) {
+			return String.format("n%d | n%d", nodeIds.get(first), nodeIds.get(second));
+		}
 		public String toString() {
 			return "(" + this.first.toString() + ")+(" + this.second.toString(); 
 		}
@@ -228,6 +229,20 @@ public class GrammarUtils {
 		public NodeData getData() {
 			return this.data;
 		}
+
+		@Override
+		public String toStringLark(Map<Node, Integer> nodeIds) {
+			if (this.children.size() == 0){
+				return "";
+			} else {
+				StringBuilder sb = new StringBuilder();
+				for(Node child : this.children) {
+					sb.append("n").append(nodeIds.get(child)).append(" | ");
+				}
+				return sb.substring(0, sb.length() - 3); // remove the extra " | "
+			}
+		}
+
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			for(Node child : this.children) {
@@ -258,6 +273,12 @@ public class GrammarUtils {
 		public NodeData getData() {
 			return this.data;
 		}
+
+		@Override
+		public String toStringLark(Map<Node, Integer> nodeIds) {
+			return String.format("n%d n%d* n%d", nodeIds.get(start), nodeIds.get(rep), nodeIds.get(end));
+		}
+
 		public String toString() {
 			return this.start.toString() + "(" + this.rep.toString() + ")*" + this.end.toString();
 		}

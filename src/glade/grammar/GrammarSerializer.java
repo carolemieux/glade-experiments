@@ -249,6 +249,8 @@ public class GrammarSerializer {
 	private static class NodeDeserializer {
 		private final List<NodeSerialization> nodeSerializations;
 		private final List<Node> nodes;
+		private Map<Node, Integer> nodesToIds = new HashMap<>();
+
 		private NodeDeserializer(List<NodeSerialization> nodeSerializations) {
 			this.nodeSerializations = nodeSerializations;
 			this.nodes = new ArrayList<Node>();
@@ -285,17 +287,16 @@ public class GrammarSerializer {
 				} else {
 					throw new RuntimeException("Unrecognized node type: " + nodeSerialization.getClass().getName());
 				}
-
+				nodesToIds.put(this.nodes.get(index), index);
 			}
 			return this.nodes.get(index);
 		}
 		private List<Node> deserialize() {
 			for(int i=0; i<this.nodeSerializations.size(); i++) {
 				this.deserialize(i);
+
 				if (larkOutput) {
-					if (this.nodes.get(i) instanceof MultiConstantNode){
-						System.out.printf("[GRAMMAR] n%d: %s\n", i, this.nodes.get(i).toString());
-					}
+					System.out.printf("[GRAMMAR] n%d: %s\n", i, this.nodes.get(i).toStringLark(nodesToIds));
 				}
 			}
 			return this.nodes;
