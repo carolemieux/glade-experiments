@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Set;
 
 public class GrammarUtils {
+	static boolean larkOutput = Boolean.getBoolean("glade.serialize.lark");
+
 	public static class Grammar {
 		public final Node node;
 		public final NodeMerges merges;
@@ -109,7 +111,58 @@ public class GrammarUtils {
 		public NodeData getData() {
 			return this.data;
 		}
+
+		private String toStringLark() {
+			StringBuilder sb = new StringBuilder();
+			int numCOs = this.characterOptions.size();
+			int i = 0;
+			boolean needsOpen = true;
+			for(Set<Character> characterOption : this.characterOptions) {
+				if (characterOption.size() > 1 ) {
+					if (i > 0) {
+						// closes
+						sb.append("\" ");
+					}
+					sb.append("(");
+					boolean start = true;
+					for(char character : characterOption) {
+						if (start){
+							sb.append("\"");
+							sb.append(character);
+							sb.append("\"");
+							start = false;
+						} else {
+							sb.append(" | ").append("\"").append(character).append("\"");
+						}
+					}
+					sb.append(")");
+					if (i < numCOs -1) {
+						needsOpen = true;
+					}
+				} else {
+					if (needsOpen) {
+						needsOpen = false;
+						sb.append("\"");
+					}
+					boolean start = true;
+					for(char character : characterOption) {
+						assert(start);
+						sb.append(character);
+						start = false;
+					}
+				}
+				i += 1;
+			}
+			if (!needsOpen) {
+				sb.append("\"");
+			}
+			return sb.toString();
+		}
+
 		public String toString() {
+			if (GrammarUtils.larkOutput) {
+				return toStringLark();
+			}
 			StringBuilder sb = new StringBuilder();
 			for(Set<Character> characterOption : this.characterOptions) {
 				if (characterOption.size() > 1 ) {

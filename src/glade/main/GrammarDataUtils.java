@@ -67,6 +67,7 @@ public class GrammarDataUtils {
 	public static Grammar loadGrammar(String filename) {
 		try {
 			DataInputStream dis = new DataInputStream(new FileInputStream(filename));
+			System.out.println("Deserializing everyone...");
 			return GrammarSerializer.deserializeNodeWithMerges(dis);
 		} catch(IOException e) {
 			throw new RuntimeException("Error opening grammar file during grammar load: " + filename, e);

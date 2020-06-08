@@ -92,6 +92,7 @@ public class Main {
 	}
 	
 	public static void runFuzz(ProgramSettings program, GrammarSettings grammar, FuzzSettings fuzz, Random random) {
+		System.out.printf("Running learn with path %s\n", grammar.grammarPath);
 		Iterable<String> samples = fuzz.fuzzer.getSamples(program, grammar, fuzz, random);
 		int pass = 0;
 		int count = 0;

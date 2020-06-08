@@ -29,12 +29,11 @@ import glade.util.Utils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GrammarSerializer {
+	static boolean larkOutput = Boolean.getBoolean("glade.serialize.lark");
+
 	public static void serialize(String string, DataOutputStream dos) throws IOException {
 		if(string == null) {
 			dos.writeInt(-1);
@@ -260,21 +259,25 @@ public class GrammarSerializer {
 		private Node deserialize(int index) {
 			if (this.nodes.get(index) == null) {
 				NodeSerialization nodeSerialization = this.nodeSerializations.get(index);
-				if(nodeSerialization instanceof ConstantNodeSerialization) {
-					this.nodes.set(index, new ConstantNode(nodeSerialization.getData()));
+				if (nodeSerialization instanceof ConstantNodeSerialization) {
+					ConstantNode cn = new ConstantNode(nodeSerialization.getData());
+					this.nodes.set(index, cn);
 				} else if(nodeSerialization instanceof AlternationNodeSerialization) {
 					AlternationNodeSerialization altNodeSerialization = (AlternationNodeSerialization)nodeSerialization;
-					this.nodes.set(index, new AlternationNode(altNodeSerialization.getData(), this.deserialize(altNodeSerialization.first), this.deserialize(altNodeSerialization.second)));
+					AlternationNode an = new AlternationNode(altNodeSerialization.getData(), this.deserialize(altNodeSerialization.first), this.deserialize(altNodeSerialization.second));
+					this.nodes.set(index, an);
 				} else if(nodeSerialization instanceof MultiAlternationNodeSerialization) {
 					MultiAlternationNodeSerialization maltNodeSerialization = (MultiAlternationNodeSerialization)nodeSerialization;
 					List<Node> children = new ArrayList<Node>();
 					for(int childIndex : maltNodeSerialization.children) {
 						children.add(this.deserialize(childIndex));
 					}
-					this.nodes.set(index, new MultiAlternationNode(maltNodeSerialization.getData(), children));
+					MultiAlternationNode maltn = new MultiAlternationNode(maltNodeSerialization.getData(), children);
+					this.nodes.set(index, maltn);
 				} else if(nodeSerialization instanceof RepetitionNodeSerialization) {
 					RepetitionNodeSerialization repNodeSerialization = (RepetitionNodeSerialization)nodeSerialization;
-					this.nodes.set(index, new RepetitionNode(repNodeSerialization.getData(), this.deserialize(repNodeSerialization.start), this.deserialize(repNodeSerialization.rep), this.deserialize(repNodeSerialization.end)));
+					RepetitionNode rn = new RepetitionNode(repNodeSerialization.getData(), this.deserialize(repNodeSerialization.start), this.deserialize(repNodeSerialization.rep), this.deserialize(repNodeSerialization.end));
+					this.nodes.set(index, rn);
 				} else if(nodeSerialization instanceof MultiConstantNodeSerialization) {
 					MultiConstantNodeSerialization mconstNodeSerialization = (MultiConstantNodeSerialization)nodeSerialization;
 					MultiConstantNode mcn = new MultiConstantNode(mconstNodeSerialization.getData(), mconstNodeSerialization.characterOptions, mconstNodeSerialization.characterChecks);
@@ -282,12 +285,18 @@ public class GrammarSerializer {
 				} else {
 					throw new RuntimeException("Unrecognized node type: " + nodeSerialization.getClass().getName());
 				}
+
 			}
 			return this.nodes.get(index);
 		}
 		private List<Node> deserialize() {
 			for(int i=0; i<this.nodeSerializations.size(); i++) {
 				this.deserialize(i);
+				if (larkOutput) {
+					if (this.nodes.get(i) instanceof MultiConstantNode){
+						System.out.printf("[GRAMMAR] n%d: %s\n", i, this.nodes.get(i).toString());
+					}
+				}
 			}
 			return this.nodes;
 		}
@@ -348,16 +357,37 @@ public class GrammarSerializer {
 		}
 		List<Node> nodes = new NodeDeserializer(nodeSerializations).deserialize();
 		NodeMerges merges = new NodeMerges();
+		Set<Set<Integer>> unorderedMerges = new HashSet<Set<Integer>>();
 		int numMerges = dis.readInt(); // 4
 		for(int i=0; i<numMerges; i++) {
 			int numCurMerges = dis.readInt(); // 5
 			for(int j=0; j<numCurMerges; j++) {
+				HashSet<Integer> thisMerge = new HashSet<>();
 				int first = dis.readInt(); // 6
 				int second = dis.readInt(); // 7
+				thisMerge.add(first);
+				thisMerge.add(second);
+				unorderedMerges.add(thisMerge);
 				merges.add(nodes.get(first), nodes.get(second));
-				System.out.printf("MERGE %d, %d: N%d == N%d\n", i, j, first, second);
 			}
-		}		
+		}
+		if (larkOutput) {
+			int i = 0;
+			for (Set<Integer> unorderedMerge : unorderedMerges) {
+				System.out.printf("[MERGE] m%d: ", i);
+				boolean start = true;
+				for (Integer mid : unorderedMerge) {
+					if (!start) {
+						System.out.printf(" == ");
+					} else {
+						start = false;
+					}
+					System.out.printf("n%d", mid);
+				}
+				i += 1;
+				System.out.println();
+			}
+		}
 		return new Grammar(nodes.get(0), merges);
 	}
 }
