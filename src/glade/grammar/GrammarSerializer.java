@@ -79,7 +79,10 @@ public class GrammarSerializer {
 	public static String toHexString(String s) {
 		StringBuilder out = new StringBuilder();
 		for (char ch: s.toCharArray()) {
-			if (ch >= 32 && ch < 127){
+			if (ch == '\n'){
+				out.append("NEWLINE");
+			}
+			else if (ch >= 32 && ch < 127){
 				out.append(String.format("%c", ch));
 			} else
 			{
@@ -296,7 +299,7 @@ public class GrammarSerializer {
 				this.deserialize(i);
 
 				if (larkOutput) {
-					System.out.printf("[GRAMMAR] n%d: %s\n", i, this.nodes.get(i).toStringLark(nodesToIds));
+					System.out.printf("[GRAMMAR] n%d: %s\n", i, toHexString(nodes.get(i).toStringLark(nodesToIds)));
 				}
 			}
 			return this.nodes;
