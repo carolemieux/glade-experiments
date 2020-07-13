@@ -134,11 +134,7 @@ public class Main {
 			return Program.FLEX;
 		} else if(programName.equals("xml")) {
 			return Program.XML;
-		} else if(programName.equals("whilepy")) {
-			return Program.WHILEPY;
-		} else if(programName.equals("while")) {
-			return Program.WHILE;
-		}  else if(programName.equals("python")) {
+		} else if(programName.equals("python")) {
 			return Program.PYTHON;
 		} else if(programName.equals("python-wrapped")) {
 			return Program.PYTHON_WRAPPED;
