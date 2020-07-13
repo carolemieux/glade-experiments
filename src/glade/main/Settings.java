@@ -14,6 +14,7 @@
 
 package glade.main;
 
+import glade.constants.Files;
 import glade.constants.program.*;
 import glade.grammar.fuzz.GrammarFuzzer.CombinedMutationSampler;
 import glade.grammar.fuzz.GrammarFuzzer.GrammarMutationSampler;
@@ -21,8 +22,17 @@ import glade.grammar.fuzz.GrammarFuzzer.GrammarSampler;
 import glade.grammar.fuzz.GrammarFuzzer.SampleParameters;
 import glade.main.ProgramDataUtils.ProgramData;
 import glade.main.ProgramDataUtils.ProgramExamples;
+import glade.util.OracleUtils;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 public class Settings {
@@ -43,7 +53,41 @@ public class Settings {
 			this.name = name;
 		}
 	}
-	
+
+	public static class YAMLProgramSettingsFactory {
+		String configFileName;
+
+		public YAMLProgramSettingsFactory(String configFileName){
+			this.configFileName = configFileName;
+		}
+
+		ProgramSettings getSettings() throws FileNotFoundException {
+			Path p = Paths.get(configFileName);
+			String parentDir = p.getParent().toString();
+
+			Yaml yaml = new Yaml();
+
+			InputStream inputStream = new FileInputStream(configFileName);
+
+			Map<String, Object> configMap = yaml.load(inputStream);
+
+			String name = (String) configMap.get("name");
+			String emptyInput = (String) configMap.get("empty");
+			String exampleExtension = (String) configMap.get("extension");
+			String command = (String) configMap.get("command");
+			String traindir = (String) configMap.get("traindir");
+			Boolean iserror = (Boolean) configMap.get("iserror");
+
+			ProgramDataUtils.FileParameters fp = new ProgramDataUtils.FileParameters(parentDir,	"seed-" + name,
+					"aux_seed-" + name, 400, Paths.get(parentDir, traindir).toString());
+			ProgramData programData = new ProgramDataUtils.ShellProgramData(fp, command, iserror);
+			ProgramExamples programExamples = new ProgramDataUtils.MultiFileProgramExamplesCustomPath(fp, name, exampleExtension,
+					emptyInput, new OracleUtils.IdentityWrapper());
+
+			return new ProgramSettings(programData, programExamples, name);
+		}
+	}
+
 	public static class FuzzSettings {
 		public final int numMutations;
 		public final int numIters;
@@ -60,11 +104,9 @@ public class Settings {
 	}
 	
 	public static enum Program {
-		ARITH, XML, XMLPARSER, GREP, SED, FLEX, PYTHON, PYTHON_WRAPPED, WHILEPY, WHILE;
-		public ProgramSettings getSettings() {
+		XML, XMLPARSER, GREP, SED, FLEX, PYTHON, PYTHON_WRAPPED, WHILEPY, WHILE, CUSTOM;
+		public ProgramSettings getSettings(String programName) {
 			switch(this) {
-			case ARITH:
-				return new ProgramSettings(ArithData.ARITH_DATA, ArithData.ARITH_EXAMPLES, ArithData.ARITH_NAME);
 			case XML:
 				return new ProgramSettings(XmlData.XML_DATA, XmlData.XML_EXAMPLES, XmlData.XML_NAME);
 			case XMLPARSER:
@@ -83,7 +125,14 @@ public class Settings {
 				return new ProgramSettings(WhileData.WHILE_DATA, WhileData.WHILE_EXAMPLES, WhileData.WHILE_NAME);
 			case FLEX:
 				return new ProgramSettings(FlexData.FLEX_DATA, FlexData.FLEX_EXAMPLES, FlexData.FLEX_NAME);
-			default:
+			case CUSTOM:
+				YAMLProgramSettingsFactory factory = new YAMLProgramSettingsFactory(programName);
+				try {
+					return factory.getSettings();
+				} catch (FileNotFoundException e) {
+					throw new RuntimeException("Invalid config file: " + programName);
+				}
+				default:
 				throw new RuntimeException("Invalid settings!");
 			}
 		}

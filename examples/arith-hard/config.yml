@@ -1,0 +1,6 @@
+name: "arith-hard"
+empty: "0"
+iserror: true
+extension: ".arith"
+command: "parse_arith.py"
+traindir: "inputs-train"

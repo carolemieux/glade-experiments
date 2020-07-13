@@ -123,13 +123,14 @@ public class Main {
 	
 	private static Program getProgram(String programName) {
 		if(programName == null) { usage(); }
+		if (programName.endsWith(".yml")) {
+			return Program.CUSTOM;
+		}
 		if(programName.equals("sed")) {
 			return Program.SED;
 		} else if(programName.equals("grep")) {
 			return Program.GREP;
-		 }else if(programName.equals("arith")) {
-			return Program.ARITH;
-		} else if(programName.equals("flex")) {
+		 } else if(programName.equals("flex")) {
 			return Program.FLEX;
 		} else if(programName.equals("xml")) {
 			return Program.XML;
@@ -164,6 +165,9 @@ public class Main {
 	public static void run(String[] args) {
 		String mode = null;
 		String programName = null;
+		String manualProgName = null;
+		String manualProgExe = null;
+		String manualProgExamples = null;
 		String fuzzerName = null;
 		String logName = null;
 		boolean verbose = false;
@@ -178,6 +182,18 @@ public class Main {
 				if(programName != null) { usage(); }
 				i++;
 				programName = args[i];
+			} else if(args[i].equals("-program-name")) {
+				if(manualProgName != null) { usage(); }
+				i++;
+				manualProgName = args[i];
+			} else if(args[i].equals("-program-exe")) {
+				if (manualProgExe != null) {usage();}
+				i++;
+				manualProgExe = args[i];
+			} else if(args[i].equals("-program-examples")) {
+				if(manualProgExamples != null) { usage(); }
+				i++;
+				manualProgExamples = args[i];
 			} else if(args[i].equals("-fuzzer")) {
 				if(fuzzerName != null) { usage(); }
 				i++;
@@ -215,8 +231,8 @@ public class Main {
 				List<String> passedPrograms = new ArrayList<String>();
 				List<String> failedPrograms = new ArrayList<String>();
 				for(Program program : programs) {
-					IntPair curResults = runTest(program.getSettings());
-					(curResults.fail == 0 ? passedPrograms : failedPrograms).add(program.getSettings().name);
+					IntPair curResults = runTest(program.getSettings(programName));
+					(curResults.fail == 0 ? passedPrograms : failedPrograms).add(program.getSettings(programName).name);
 					pass += curResults.pass;
 					fail += curResults.fail;
 				}
@@ -235,7 +251,7 @@ public class Main {
 				GrammarSettings grammarSettings = getDefaultGrammarSettings();
 				Program program = getProgram(programName);
 				long time = System.currentTimeMillis();
-				runLearn(program.getSettings(), grammarSettings);
+				runLearn(program.getSettings(programName), grammarSettings);
 				Log.info("TOTAL TIME: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
 			} else if(mode.equals("fuzz")) {
 				Random random = new Random();
@@ -243,7 +259,7 @@ public class Main {
 				Program program = getProgram(programName);
 				Fuzzer fuzzer = getFuzzer(fuzzerName);
 				FuzzSettings fuzzerSettings = getDefaultFuzzSettings(random, fuzzer);
-				runFuzz(program.getSettings(), grammarSettings, fuzzerSettings, random);
+				runFuzz(program.getSettings(programName), grammarSettings, fuzzerSettings, random);
 			} else {
 				usage();
 			}

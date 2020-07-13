@@ -145,6 +145,7 @@ public class ProgramDataUtils {
 		private final String extension;
 		private final String emptyExample;
 		private final Wrapper exampleProcessor;
+		protected String pathext;
 		
 		public MultiFileProgramExamples(FileParameters file, String name, String extension, String emptyExample, Wrapper exampleProcessor) {
 			this.name = name;
@@ -152,11 +153,13 @@ public class ProgramDataUtils {
 			this.emptyExample = emptyExample;
 			this.exampleProcessor = exampleProcessor;
 			this.file = file;
+			this.pathext = name;
 		}
 		
 		private List<String> getExamples(String path) {
 			List<String> examples = new ArrayList<String>();
-			for(File file : new File(path, this.name).listFiles()) {
+			System.out.println("Getting examples for path: " + path + ", name is: " + name);
+			for(File file : new File(path, this.pathext).listFiles()) {
 				if(!file.getName().endsWith(this.extension)) {
 					continue;
 				}
@@ -185,5 +188,14 @@ public class ProgramDataUtils {
 		public List<String> getEmptyExamples() {
 			return Utils.getList(this.emptyExample);
 		}
+	}
+
+	public static class MultiFileProgramExamplesCustomPath extends MultiFileProgramExamples {
+
+		public MultiFileProgramExamplesCustomPath(FileParameters file, String name, String extension, String emptyExample, Wrapper exampleProcessor) {
+			super(file,name, extension, emptyExample, exampleProcessor);
+			this.pathext = "";
+		}
+
 	}
 }

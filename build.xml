@@ -17,7 +17,11 @@
 <project default="build">
   <target name="build">
     <mkdir dir="classes"/>
-    <javac srcdir="src" destdir="classes" debug="on"/>
+    <javac srcdir="src" destdir="classes" debug="on">
+      <classpath>
+        <pathelement path="snakeyaml-1.25.jar"/>
+      </classpath>
+    </javac>
     <jar destfile="glade.jar" basedir="classes">
       <manifest>
         <attribute name="Main-Class" value="glade.main.Main"/>
@@ -28,4 +32,5 @@
     <delete dir="classes"/>
     <delete file="glade.jar"/>
   </target>
+
 </project>
