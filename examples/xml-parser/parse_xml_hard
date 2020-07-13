@@ -1,0 +1,83 @@
+#!/usr/bin/python3
+import sys
+from lark import Lark
+
+grammar ="""start: main
+main: "<a" spaces attrlist ">" body "</a>" 
+     | "<a" ">" body "</a>"
+     | "<a" ">" "</a>"
+body: main 
+     | text 
+     | main body 
+     | text body
+text: "a"
+     | "a" text
+     | "b"
+     | "b" text
+     | "c"
+     | "c" text
+     | "d"
+     | "d" text
+     | "e"
+     | "e" text
+     | "f"
+     | "f" text
+     | "g"
+     | "g" text
+     | "h"
+     | "h" text
+     | "i"
+     | "i" text
+     | "j"
+     | "j" text
+     | "k"
+     | "k" text
+     | "l"
+     | "l" text
+     | "m"
+     | "m" text
+     | "n"
+     | "n" text
+     | "o"
+     | "o" text
+     | "p"
+     | "p" text
+     | "q"
+     | "q" text
+     | "r"
+     | "r" text
+     | "s"
+     | "s" text
+     | "t"
+     | "t" text
+     | "u"
+     | "u" text
+     | "v"
+     | "v" text
+     | "w"
+     | "w" text
+     | "x"
+     | "x" text
+     | "y"
+     | "y" text
+     | "z"
+     | "z" text
+attrlist: attr 
+        | attr "SPACE" attrlist
+attr: text "='" text "'"
+spaces: "SPACE" 
+       | "SPACE" spaces
+"""
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: {sys.argv[0]} <input-file>")
+        exit(1)
+
+    in_file = sys.argv[1]
+    parser = Lark(grammar)
+    v = parser.parse(open(in_file).read().rstrip())
+    exit(0)
+
+if __name__ == '__main__':
+    main()

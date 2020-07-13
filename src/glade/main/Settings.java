@@ -104,13 +104,11 @@ public class Settings {
 	}
 	
 	public static enum Program {
-		XML, XMLPARSER, GREP, SED, FLEX, PYTHON, PYTHON_WRAPPED, WHILEPY, WHILE, CUSTOM;
+		XML, GREP, SED, FLEX, PYTHON, PYTHON_WRAPPED, WHILEPY, WHILE, CUSTOM;
 		public ProgramSettings getSettings(String programName) {
 			switch(this) {
 			case XML:
 				return new ProgramSettings(XmlData.XML_DATA, XmlData.XML_EXAMPLES, XmlData.XML_NAME);
-			case XMLPARSER:
-				return new ProgramSettings(XmlParserData.XML_DATA, XmlParserData.XML_EXAMPLES, XmlParserData.XML_NAME);
 			case PYTHON:
 				return new ProgramSettings(PythonData.PYTHON_DATA, PythonData.PYTHON_EXAMPLES, PythonData.PYTHON_NAME);
 			case PYTHON_WRAPPED:

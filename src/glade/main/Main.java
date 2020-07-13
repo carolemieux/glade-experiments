@@ -134,8 +134,6 @@ public class Main {
 			return Program.FLEX;
 		} else if(programName.equals("xml")) {
 			return Program.XML;
-		} else if(programName.equals("xmlparser")) {
-			return Program.XMLPARSER;
 		} else if(programName.equals("whilepy")) {
 			return Program.WHILEPY;
 		} else if(programName.equals("while")) {
