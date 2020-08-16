@@ -1,6 +1,0 @@
-name: "xml-parser"
-empty: "<a></a>"
-iserror: true
-extension: ".xml"
-command: "parse_xml_hard"
-traindir: "inputs-train"

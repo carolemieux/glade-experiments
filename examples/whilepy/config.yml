@@ -1,6 +1,0 @@
-name: "whilepy"
-empty: "passNEWLINE"
-iserror: true
-extension: ".py"
-command: "parse_whilepy.py"
-traindir: "inputs-train"

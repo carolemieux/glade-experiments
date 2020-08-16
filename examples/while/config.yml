@@ -1,6 +1,0 @@
-name: "while"
-empty: "L=n"
-iserror: true
-extension: ".while"
-command: "parse_while.py"
-traindir: "inputs-train"

@@ -5,3 +5,4 @@ data/grammars
 log.txt
 *.class
 classes
+examples/*
