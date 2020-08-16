@@ -28,6 +28,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -158,21 +161,15 @@ public class ProgramDataUtils {
 		
 		private List<String> getExamples(String path) {
 			List<String> examples = new ArrayList<String>();
-			System.out.println("Getting examples for path: " + path + ", name is: " + name);
 			for(File file : new File(path, this.pathext).listFiles()) {
 				if(!file.getName().endsWith(this.extension)) {
 					continue;
 				}
 				try {
-					StringBuilder sb = new StringBuilder();
-					BufferedReader br = new BufferedReader(new FileReader(file));
-					String line;
-					while((line = br.readLine()) != null) {
-						sb.append(line).append("\n");
-					}
-					br.close();
-					examples.add(this.exampleProcessor.wrap(sb.toString()));
+					String example = Files.readString(Paths.get(path, this.pathext, file.getName()));
+					examples.add(this.exampleProcessor.wrap(example));
 				} catch(IOException e) {
+					System.out.println(e.getMessage());
 					throw new RuntimeException("Error reading examples!", e);
 				}
 			}

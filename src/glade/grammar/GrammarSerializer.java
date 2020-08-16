@@ -307,6 +307,7 @@ public class GrammarSerializer {
 	}
 	
 	public static Grammar deserializeNodeWithMerges(DataInputStream dis) throws IOException {
+		System.out.println("Lark output? " + Boolean.toString(larkOutput));
 		int numNodes = dis.readInt(); // 0
 		List<NodeSerialization> nodeSerializations = new ArrayList<NodeSerialization>(numNodes);
 		for(int i=0; i<numNodes; i++) {
