@@ -38,7 +38,7 @@ public class Main {
 	}
 	
 	public static FuzzSettings getDefaultFuzzSettings(Random random, Fuzzer fuzzer) {
-		return new FuzzSettings(20, 10, 1000, getDefaultSampleParameters(), fuzzer);
+		return new FuzzSettings(20, 100, 1000, getDefaultSampleParameters(), fuzzer);
 	}
 	
 	private static boolean runTest(ProgramSettings program, String example) {

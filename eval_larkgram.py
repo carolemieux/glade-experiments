@@ -26,6 +26,7 @@ def main():
     if verbose:
         print("-----------------------------")
     print(f"Succesfully parsed {100*success/count}% of infiles.")
+    print(f"Precision: {success/count}")
 
 if __name__ == '__main__':
     main()

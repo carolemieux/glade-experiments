@@ -79,11 +79,11 @@ def main():
                 nonterminals += 1
                 total_nonterm_productions += len(prods)
             total_productions += len(prods)
-    print("%%%%%%STATS%%%%%%")
-    print(f"% nonterms: {nonterminals} %")
-    print(f"% prods: {total_productions} %")
-    print(f"% nt prods: {total_nonterm_productions} %")
-    print("%%%%%%%%%%%%%%%%%")
+  #  print("%%%%%%STATS%%%%%%")
+   # print(f"% nonterms: {nonterminals} %")
+  #  print(f"% prods: {total_productions} %")
+ #   print(f"% nt prods: {total_nonterm_productions} %")
+#    print("%%%%%%%%%%%%%%%%%")
 
 
 
