@@ -86,7 +86,7 @@ public class GrammarSerializer {
 				out.append(String.format("%c", ch));
 			} else
 			{
-				out.append(String.format("0x%02X", (byte)(ch)));
+				out.append(String.format("\\u00%02x", (byte)(ch)));
 			}
 		}
 		return out.toString();

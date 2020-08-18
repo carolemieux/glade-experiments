@@ -8,12 +8,50 @@ final_gram_line = re.compile("([mn][0-9]+): (.*)")
 grammar = defaultdict(set)
 merge_line = re.compile("\[MERGE\] (.*): (.*) == (.*)")
 equiv_sets = []
+equiv_pairs = set()
 replace_map = {}
+
+
+def neighbors(node):
+    assert(equiv_pairs)
+    rets = set()
+    for pair in equiv_pairs:
+        if pair[0] == node:
+            rets.add(pair[1])
+    return rets
+
+def degree(node):
+    ns = neighbors(node)
+    return len(ns)
+
+def bron_kerbosh_2(r, p, x):
+    if len(p) == 0 and len(x) == 0:
+        equiv_sets.append(r)
+        return
+    max_degree = max([degree(n) for n in p.union(x)])
+    u = [n for n in p.union(x) if degree(n) == max_degree][0]
+    for v in p.difference(neighbors(u)):
+        bron_kerbosh_2(r.cup({v}), p.intersect(neighbors(v)), x.intersect(neighbors(v)))
+        p.remove(v)
+        x.add(v)
+
+def verify_equiv_sets():
+    for elems in equiv_sets:
+        for elem in elems:
+            for other_elem in elems.difference({elem}):
+                if (elem, other_elem) not in equiv_pairs or (other_elem, elem) not in equiv_pairs:
+                    print(f"{elem} and {other_elem} weren't found to be equivalnet")
+                    assert(False)
+
 
 def process_grammar_line(line, match):
     outline = match.group(2)
-    for key, replace in replace_map.items():
-        outline = outline.replace(key, replace)
+    for key, replace in sorted(list(replace_map.items()), reverse=True):
+        m = re.search(f"({key})[^0-9]", outline)
+        while m is not None:
+            start, end = m.start(1), m.end(1)
+            outline = outline[:start] + replace + outline[end:]
+            m = re.search(f"({key})[^0-9]", outline)
     m = final_gram_line.match(outline)
     assert(m)
     grammar[m.group(1)].add(m.group(2))
@@ -21,30 +59,30 @@ def process_grammar_line(line, match):
 def process_merge_line(line, match):
     first = match.group(2)
     second = match.group(3)
-    if equiv_sets:
-        for equiv_set in equiv_sets:
-            if first in equiv_set:
-                if second not in equiv_set:
-                    equiv_set.append(second)
-                return
-            elif second in equiv_set:
-                equiv_set.append(first)
-                return
-    equiv_sets.append([first, second])
+    
+    equiv_pairs.add((first, second))
+    equiv_pairs.add((second, first))
 
 def process_merge_sets():
-    for i, set in enumerate(equiv_sets):
+    nodes_with_merge = set([node for pair in equiv_pairs for node in pair])
+    bron_kerbosh_2(nodes_with_merge, set(), set())
+    #verify_equiv_sets()
+    for i, elems in enumerate(equiv_sets):
         replacement = f"m{i}"
-        for elem in set:
+        for elem in elems:
+            assert(elem not in replace_map)  # what do we do then?? D:
             replace_map[elem] = replacement
 
 
 def main():
+    dquote_appears = False
     grammar_lines = []
     merge_lines = []
     if len(sys.argv) != 2:
         print(f"Usage: {sys.argv[0]} deserialization-to-fixup")
     for line in open(sys.argv[1]):
+        if not dquote_appears and "DQUOTE" in line:
+            dquote_appears = True
         mg = grammar_line.match(line)
         mm = merge_line.match(line)
         if mg is not None:
@@ -53,7 +91,7 @@ def main():
             merge_lines.append((line, mm))
     for ml, mm in merge_lines:
         process_merge_line(ml, mm)
-    # process_merge_sets()
+    process_merge_sets()
     print('start: n0')
     nonterminals = 0
     total_productions = 0
@@ -79,6 +117,8 @@ def main():
                 nonterminals += 1
                 total_nonterm_productions += len(prods)
             total_productions += len(prods)
+    if dquote_appears:
+        print("DQUOTE: \"\\u0022\"")
   #  print("%%%%%%STATS%%%%%%")
    # print(f"% nonterms: {nonterminals} %")
   #  print(f"% prods: {total_productions} %")

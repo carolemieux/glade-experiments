@@ -9,8 +9,10 @@ def main():
         print("Usage: {sys.argv[0]} <grammar-file> <input-files>")
         exit(1)
 
-    grammar = "".join(open(sys.argv[1]).readlines())
+    grammar = r"".join(open(sys.argv[1]).readlines())
+    if verbose: print("creating parser...")
     parser = Lark(grammar)
+    if verbose: print("parser created.")
     count = 0
     success = 0
     for in_file in sys.argv[2:]:

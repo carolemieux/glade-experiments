@@ -83,7 +83,8 @@ public class GrammarUtils {
 			return this.data;
 		}
 		public String toStringLark(Map<Node, Integer> nodeIds) {
-			return "\"" + this.data.example + "\"";
+			String innerString = this.data.example.replaceAll("\"", "\\u0022");
+			return "\"" + innerString + "\"";
 		}
 		public String toString() {
 			return this.data.example;
@@ -120,44 +121,59 @@ public class GrammarUtils {
 				return "";
 			}
 			int i = 0;
-			boolean needsOpen = true;
+			boolean last_was_set = false;
+			boolean last_was_char = false;
 			for(Set<Character> characterOption : this.characterOptions) {
 				if (characterOption.size() > 1 ) {
-					if (i > 0) {
+					if (last_was_char) {
 						// closes
 						sb.append("\" ");
 					}
+					last_was_set = true;
+					last_was_char = false;
 					sb.append("(");
 					boolean start = true;
 					for(char character : characterOption) {
+						String toAppend = Character.toString(character);
+						if (character == '\"'){
+							toAppend = "\\u0022";
+						} else if (character == '\\'){
+							toAppend = "\\\\";
+						}
 						if (start){
 							sb.append("\"");
-							sb.append(character);
+							sb.append(toAppend);
 							sb.append("\"");
 							start = false;
 						} else {
-							sb.append(" | ").append("\"").append(character).append("\"");
+							sb.append(" | ").append("\"").append(toAppend).append("\"");
 						}
 					}
 					sb.append(")");
 					if (i < numCOs -1) {
-						needsOpen = true;
+						sb.append(" ");
 					}
 				} else {
-					if (needsOpen) {
-						needsOpen = false;
+					if (!last_was_char) {
 						sb.append("\"");
 					}
+					last_was_char = true;
 					boolean start = true;
 					for(char character : characterOption) {
 						assert(start);
-						sb.append(character);
+						String toAppend = Character.toString(character);
+						if (character == '\"'){
+							toAppend = "\\u0022";
+						} else if (character == '\\'){
+							toAppend = "\\\\";
+						}
+						sb.append(toAppend);
 						start = false;
 					}
 				}
 				i += 1;
 			}
-			if (!needsOpen) {
+			if (last_was_char) {
 				sb.append("\"");
 			}
 			return sb.toString();
