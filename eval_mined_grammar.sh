@@ -5,4 +5,4 @@ egrep "GRAMMAR|MERGE" ${bench}-eval.log > raw-gram.tmp
 python3 larkfixup.py raw-gram.tmp > ${bench}-gram.lark
 python3 eval_larkgram.py ${bench}-gram.lark examples/${bench}/test_set/* | tail -n 1
 
-tail -n 1 ${bench}-eval.log | sed 's/PASS RATE/Recall/'
+tail -n 1 ${bench}-eval.log | sed 's/PASS RATE/Precision/'

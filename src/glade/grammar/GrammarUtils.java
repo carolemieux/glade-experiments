@@ -131,9 +131,11 @@ public class GrammarUtils {
 					}
 					last_was_set = true;
 					last_was_char = false;
-					sb.append("(");
+					sb.append("CCC(");
 					boolean start = true;
-					for(char character : characterOption) {
+					List<Character> sortedCharacterOption = new ArrayList<Character>(characterOption);
+					sortedCharacterOption.sort(Comparator.naturalOrder());
+					for(char character : sortedCharacterOption) {
 						String toAppend = Character.toString(character);
 						if (character == '\"'){
 							toAppend = "\\u0022";
@@ -149,7 +151,7 @@ public class GrammarUtils {
 							sb.append(" | ").append("\"").append(toAppend).append("\"");
 						}
 					}
-					sb.append(")");
+					sb.append(")CCC");
 					if (i < numCOs -1) {
 						sb.append(" ");
 					}
