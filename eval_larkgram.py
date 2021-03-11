@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
 from lark import Lark
+from tqdm import tqdm
 
 verbose = True
 
@@ -15,7 +16,7 @@ def main():
     if verbose: print("parser created.")
     count = 0
     success = 0
-    for in_file in sys.argv[2:]:
+    for in_file in tqdm(sys.argv[2:]):
         count += 1
         try:
             v = parser.parse(open(in_file).read().rstrip())
@@ -25,6 +26,7 @@ def main():
         except Exception as e:
             print("Failed to parse: ", in_file)
             print("Because:", e)
+        if verbose: print(f"\nparsed {success} of {count}\n")
     if verbose:
         print("-----------------------------")
     print(f"Succesfully parsed {100*success/count}% of infiles.")
