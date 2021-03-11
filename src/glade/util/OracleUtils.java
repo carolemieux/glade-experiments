@@ -17,10 +17,12 @@ package glade.util;
 public class OracleUtils {
 	public interface Oracle {
 		public String execute(String query);
+		public int getCalls();
 	}
 	
 	public interface DiscriminativeOracle {
 		public abstract boolean query(String query);
+		public int getCalls();
 	}
 	
 	public static interface Wrapper {
@@ -37,14 +39,21 @@ public class OracleUtils {
 	public static class WrappedOracle implements Oracle {
 		private final Oracle oracle;
 		private final Wrapper wrapper;
+		private int numCalls = 0;
 		
 		public WrappedOracle(Oracle oracle, Wrapper wrapper) {
 			this.oracle = oracle;
 			this.wrapper = wrapper;
 		}
+
+		@Override
+		public int getCalls() {
+			return numCalls;
+		}
 		
 		@Override
 		public String execute(String query) {
+			numCalls+= 1;
 			return this.oracle.execute(this.wrapper.wrap(query));
 		}
 	}
@@ -52,6 +61,7 @@ public class OracleUtils {
     public static class WrappedDiscriminativeOracle implements DiscriminativeOracle {
         private final DiscriminativeOracle oracle;
         private final Wrapper wrapper;
+        private int numCalls;
 
         public WrappedDiscriminativeOracle(DiscriminativeOracle oracle, Wrapper wrapper) {
                 this.oracle = oracle;
@@ -60,7 +70,13 @@ public class OracleUtils {
 
         @Override
         public boolean query(String query) {
-                return this.oracle.query(this.wrapper.wrap(query));
+        	numCalls += 1;
+        	return this.oracle.query(this.wrapper.wrap(query));
+        }
+
+		@Override
+		public int getCalls() {
+        	return numCalls;
         }
     }
 }

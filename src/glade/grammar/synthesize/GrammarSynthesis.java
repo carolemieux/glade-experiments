@@ -47,6 +47,7 @@ public class GrammarSynthesis {
 		time = System.currentTimeMillis();
 		Grammar grammar = new Grammar(node, MergesSynthesis.getMergesSingle(node, node, oracle));
 		Log.info("SINGLE MERGE TIME: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
+		Log.info("ORACLE CALLS: " + Integer.toString(oracle.getCalls()));
 		return grammar;
 	}
 	
@@ -54,6 +55,7 @@ public class GrammarSynthesis {
 		long time = System.currentTimeMillis();
 		Grammar grammar = new Grammar(new MultiAlternationNode(new NodeData(null, new Context()), roots), MergesSynthesis.getMergesMultiple(roots, oracle));
 		Log.info("MULTIPLE MERGE TIME: " + ((System.currentTimeMillis() - time)/1000.0) + " seconds");
+		Log.info("ORACLE CALLS: " + Integer.toString(oracle.getCalls()));
 		return grammar;
 	}
 	

@@ -66,7 +66,7 @@ public class ShellUtils {
 	
 	private static Process executeNoWait(String command) {
 		try {
-			String[] shellCommand = {"/bin/sh", "-c", command};
+			String[] shellCommand = {"/bin/bash", "-c", command};
 			return Runtime.getRuntime().exec(shellCommand);
 		} catch(Exception e) {
 			throw new RuntimeException("Error executing command: " + command, e);
@@ -127,6 +127,7 @@ public class ShellUtils {
 		private final String auxFilename;
 		private final boolean isError;
 		private final long timeoutMillis;
+		private int numCalls;
 		
 		public ShellOracle(String filename, String auxFilename, String command, boolean isError, long timeoutMillis) {
 			this.filename = filename;
@@ -138,6 +139,7 @@ public class ShellUtils {
 		
 		@Override
 		public String execute(String query) {
+			numCalls +=1;
 			write("", this.auxFilename);
 			write(query, this.filename);
 			String result = ShellUtils.executeForStream(this.command, this.isError, this.timeoutMillis);
@@ -145,10 +147,16 @@ public class ShellUtils {
 			delete(this.filename);
 			return result;
 		}
+
+		@Override
+		public int getCalls() {
+			return numCalls;
+		}
 	}
 	
 	public static class ExecuteDiscriminativeOracle implements DiscriminativeOracle {
 		private final Oracle oracle;
+		private int numCalls;
 		
 		public ExecuteDiscriminativeOracle(Oracle oracle) {
 			this.oracle = oracle;
@@ -156,7 +164,12 @@ public class ShellUtils {
 
 		@Override
 		public boolean query(String query) {
+			numCalls += 1;
 			return this.oracle.execute(query).matches("\\s*");
 		}
+
+		@Override
+		public int getCalls() {
+			return numCalls;}
 	}
 }
