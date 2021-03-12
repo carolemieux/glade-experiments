@@ -1,3 +1,5 @@
+#!/bin/bash
+
 bench=$1
 java -Dglade.serialize.lark=true -cp glade.jar:snakeyaml-1.25.jar glade.main.Main -mode fuzz -program examples/$bench/config.yml -fuzzer grammar -verbose > ${bench}-eval.log
 
@@ -8,4 +10,4 @@ recall=$(python3 eval_larkgram.py ${bench}-gram.lark examples/${bench}/test_set/
 precision=$(tail -n 1 ${bench}-eval.log | sed 's/PASS RATE://' )
 runtime=$(tail -n 1 ${bench}-learn.log | awk '{print $3}')
 f1=$(echo $recall $precision | awk '{print 2*$1*$2/($1+$2)}')
-printf " %.2f & %.2f & %.2f & %.0fs \n" $recall $precision $f1 $runtime
+printf " %.2f & %.2f & %.2f & %.0fs \n" $recall $precision $f1 $runtime > ${bench}-results.asv
