@@ -25,7 +25,7 @@ cp -r $orig_example_dir/${name}-test $example_dir/test_set
 cp $orig_example_dir/parse_${name} $example_dir/parse_${name}
 
 echo "name: \"$name\"" >> $example_dir/config.yml
-echo "empty: \"$(cat $(ls ${example_dir}/guides | head -n 1))\"" >> $example_dir/config.yml
+echo "empty: \"$(cat ${example_dir}/guides/$(ls ${example_dir}/guides | head -n 1))\"" >> $example_dir/config.yml
 echo "iserror: true" >> $example_dir/config.yml
 echo "extension: \".ex\"" >> $example_dir/config.yml
 echo "command: \"parse_${name}\"" >> $example_dir/config.yml
