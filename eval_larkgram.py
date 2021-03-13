@@ -6,6 +6,7 @@ from tqdm import tqdm
 verbose = True
 
 def main():
+    sys.setrecursionlimit(10000)
     if len(sys.argv) < 3:
         print("Usage: {sys.argv[0]} <grammar-file> <input-files>")
         exit(1)
