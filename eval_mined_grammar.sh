@@ -7,7 +7,7 @@ if [ -z "$PYTHON" ]; then
   exit 1
 fi
 
-egrep "GRAMMAR|MERGE" glade-results/${bench}-eval.log > raw-gram.tmp
+egrep -a "GRAMMAR|MERGE" glade-results/${bench}-eval.log > raw-gram.tmp
 $PYTHON larkfixup.py raw-gram.tmp > glade-results/${bench}-gram.lark
 
 $PYTHON eval_larkgram.py glade-results/${bench}-gram.lark examples/${bench}/test_set/* > glade-results/${bench}-recall.log
