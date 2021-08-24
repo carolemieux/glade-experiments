@@ -7,6 +7,8 @@ For a detailed introduction to GLADE, see:
 
 - [**Synthesizing Program Input Grammars**](http://arxiv.org/abs/1608.01723)
 
+**Note**: This version of the repository contains a different benchmark format that allows GLADE to be more easily run on different benchmarks, and also printts out the GLADE grammars in a human-readable format. See `eval.md` for details; contact Caroline Lemieux <clemieux@cs.berkeley.edu> with any questions on these elements.
+
 Table of Contents
 =====
 0. Prerequisites
